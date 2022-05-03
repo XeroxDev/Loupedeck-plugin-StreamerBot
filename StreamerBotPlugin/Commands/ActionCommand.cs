@@ -37,13 +37,13 @@ namespace Loupedeck.StreamerBotPlugin.Commands
         public ActionCommand() : base("Action", "Choose and execute your actions", "Action")
         {
             this._httpService = HttpService.Instance;
-            this._actions = this._httpService.GetActions().Actions;
+            this._actions = this._httpService.GetActions()?.Actions ?? Array.Empty<Action>();
             this.MakeProfileAction("tree");
         }
 
         protected override PluginProfileActionData GetProfileActionData()
         {
-            this._actions = this._httpService.GetActions().Actions;
+            this._actions = this._httpService.GetActions()?.Actions ?? Array.Empty<Action>();
             var tree = new PluginProfileActionTree("Select Windows Settings Application");
 
             tree.AddLevel("Category");

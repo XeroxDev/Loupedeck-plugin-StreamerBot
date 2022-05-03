@@ -37,13 +37,13 @@ namespace Loupedeck.StreamerBotPlugin.Commands
         public ActionAdjustmentCommand() : base("Adjustment Action", "Choose and execute your actions with adjustments (Reset sets it to 0)", "Adjustment Action", true)
         {
             this._httpService = HttpService.Instance;
-            this._actions = this._httpService.GetActions().Actions;
+            this._actions = this._httpService.GetActions()?.Actions ?? Array.Empty<Action>();
             this.MakeProfileAction("tree");
         }
 
         protected override PluginProfileActionData GetProfileActionData()
         {
-            this._actions = this._httpService.GetActions().Actions;
+            this._actions = this._httpService.GetActions()?.Actions ?? Array.Empty<Action>();
             var tree = new PluginProfileActionTree("Select Windows Settings Application");
 
             tree.AddLevel("Category");
