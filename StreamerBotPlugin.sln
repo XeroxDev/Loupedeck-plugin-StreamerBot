@@ -1,0 +1,25 @@
+
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30128.74
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{BF232534-3FEF-420C-9594-1A8B5A29BACC}") = "StreamerBotPlugin", "StreamerBotPlugin\StreamerBotPlugin.csproj", "{76EA43B7-B6BC-4D3E-B758-F4DDE3F0F19D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{76EA43B7-B6BC-4D3E-B758-F4DDE3F0F19D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{76EA43B7-B6BC-4D3E-B758-F4DDE3F0F19D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{76EA43B7-B6BC-4D3E-B758-F4DDE3F0F19D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{76EA43B7-B6BC-4D3E-B758-F4DDE3F0F19D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {C152FFBD-072C-4509-82D5-6053133C1592}
+	EndGlobalSection
+EndGlobal
