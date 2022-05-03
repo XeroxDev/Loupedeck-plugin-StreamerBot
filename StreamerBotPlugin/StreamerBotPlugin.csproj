@@ -81,5 +81,11 @@
         <None Include="App.config" />
         <None Include="packages.config" />
     </ItemGroup>
+    <ItemGroup>
+      <EmbeddedResource Include="Resources\Icons\sblogo16.png" />
+      <EmbeddedResource Include="Resources\Icons\sblogo256.png" />
+      <EmbeddedResource Include="Resources\Icons\sblogo32.png" />
+      <EmbeddedResource Include="Resources\Icons\sblogo48.png" />
+    </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
