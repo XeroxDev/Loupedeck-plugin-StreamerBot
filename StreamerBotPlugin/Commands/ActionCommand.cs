@@ -24,6 +24,7 @@ namespace Loupedeck.StreamerBotPlugin.Commands
 {
     using System;
     using System.Linq;
+    using System.Threading.Tasks;
 
     using Services;
 
@@ -37,24 +38,31 @@ namespace Loupedeck.StreamerBotPlugin.Commands
         public ActionCommand() : base("Action", "Choose and execute your actions", "Action")
         {
             this._httpService = HttpService.Instance;
-            this._actions = this._httpService.GetActions()?.Actions ?? Array.Empty<Action>();
+            this._setActions().Wait();
             this.MakeProfileAction("tree");
         }
 
+        private async Task<Action[]> _setActions() =>
+            this._actions = (await this._httpService.GetActions()).Actions;
+
+
         protected override PluginProfileActionData GetProfileActionData()
         {
-            this._actions = this._httpService.GetActions()?.Actions ?? Array.Empty<Action>();
+            this._setActions().Wait();
             var tree = new PluginProfileActionTree("Select Windows Settings Application");
 
             tree.AddLevel("Category");
             tree.AddLevel("Command");
 
-            var node = tree.Root.AddNode("Actions");
-
-            foreach (var item in this._actions.Where(action => action.Enabled))
+            this._actions.GroupBy(x => x.Group).ToList().ForEach(actionGroup =>
             {
-                node.AddItem(item.Id, item.Name, $"Execute {item.Name}");
-            }
+                var node = tree.Root.AddNode(actionGroup.Key);
+
+                foreach (var item in actionGroup.Where(action => action.Enabled))
+                {
+                    node.AddItem(item.Id, item.Name, $"Execute {item.Name}");
+                }
+            });           
 
             return tree;
         }
@@ -63,12 +71,10 @@ namespace Loupedeck.StreamerBotPlugin.Commands
         {
             var action = this._actions?.FirstOrDefault(a => actionParameter is not null && a.Id == actionParameter);
 
-            if (action == null)
+            if (action != null)
             {
-                return;
+                this._httpService.ExecuteAction(action.Id).Wait();
             }
-
-            this._httpService.ExecuteAction(action.Id);
         }
 
         protected override String GetCommandDisplayName(String actionParameter, PluginImageSize imageSize) =>
