@@ -36,22 +36,18 @@ namespace Loupedeck.StreamerBotPlugin.Commands
         private readonly HttpService _httpService;
         private Action[] _actions;
 
-        private static readonly ConcurrentDictionary<String, Int32> _ActionAdjustmentValues = new ConcurrentDictionary<String, Int32>();
+        internal static readonly ConcurrentDictionary<String, Int32> ActionAdjustmentValues = new();
 
         public ActionAdjustmentCommand() : base("Adjustment Action", "Choose and execute your actions with adjustments (Reset sets it to 0)", "Adjustment Action", true)
         {
             this._httpService = HttpService.Instance;
-            this._setActions().Wait();
+            this._actions = this._httpService.GetActions().Actions;
             this.MakeProfileAction("tree");
         }
 
-        private async Task<Action[]> _setActions() =>
-            this._actions = (await this._httpService.GetActions()).Actions;
-
-
         protected override PluginProfileActionData GetProfileActionData()
         {
-            this._setActions().Wait();
+            this._actions = this._httpService.GetActions().Actions;
             var tree = new PluginProfileActionTree("Select Windows Settings Application");
 
             tree.AddLevel("Category");
@@ -63,9 +59,9 @@ namespace Loupedeck.StreamerBotPlugin.Commands
 
                 foreach (var item in actionGroup.Where(action => action.Enabled))
                 {
-                    if (!_ActionAdjustmentValues.ContainsKey(item.Id))
+                    if (!ActionAdjustmentValues.ContainsKey(item.Id))
                     {
-                        _ActionAdjustmentValues.TryAdd(item.Id, 0);
+                        ActionAdjustmentValues.TryAdd(item.Id, 0);
                     }
 
                     node.AddItem(item.Id, item.Name, $"Execute {item.Name}");
@@ -79,45 +75,49 @@ namespace Loupedeck.StreamerBotPlugin.Commands
         {
             var action = this._actions?.FirstOrDefault(a => actionParameter is not null && a.Id == actionParameter);
 
-            if (action != null)
+            if (action == null)
             {
-                _ActionAdjustmentValues.AddOrUpdate(action.Id, 0, (key, oldValue) => 0);
-                this._httpService.ExecuteActionValue(action.Id, 0).Wait();
-                this.AdjustmentValueChanged(actionParameter);
+                return;
             }
+
+            ActionAdjustmentValues.AddOrUpdate(action.Id, 0, (key, oldValue) => 0);
+            this._httpService.ExecuteActionValue(action.Id, 0);
+            this.AdjustmentValueChanged(actionParameter);
         }
 
         protected override void ApplyAdjustment(String actionParameter, Int32 diff)
         {
             var action = this._actions?.FirstOrDefault(a => actionParameter is not null && a.Id == actionParameter);
 
-            if (action != null)
+            if (action == null)
             {
-                _ActionAdjustmentValues.AddOrUpdate(action.Id, diff, (key, oldValue) =>
-                {
-                    var retVal = Clamp(oldValue + diff, 0, 100);
-
-                    if (retVal == 100 && oldValue == 0)
-                    {
-                        return retVal = 0;
-                    }
-
-                    if (retVal != oldValue)
-                    {
-                        this._httpService.ExecuteActionValue(action.Id, diff).Wait();
-                        this.AdjustmentValueChanged(actionParameter);
-                    }
-
-                    return retVal;
-                });
+                return;
             }
+
+            ActionAdjustmentValues.AddOrUpdate(action.Id, diff, (key, oldValue) =>
+            {
+                var retVal = Clamp(oldValue + diff, 0, 99);
+
+                if (retVal == 99 && oldValue == 0)
+                {
+                    return retVal = 0;
+                }
+
+                if (retVal != oldValue)
+                {
+                    this._httpService.ExecuteActionValue(action.Id, diff);
+                    this.AdjustmentValueChanged(actionParameter);
+                }
+
+                return retVal;
+            });
         }
 
         public static Int32 Clamp(Int32 value, Int32 min, Int32 max) =>
             (value < min) ? min : (value > max) ? max : value;
 
         protected override String GetAdjustmentValue(String actionParameter) =>
-            _ActionAdjustmentValues.ContainsKey(actionParameter ?? String.Empty) ? $"({_ActionAdjustmentValues[actionParameter]})" : $"(0)";
+            ActionAdjustmentValues.ContainsKey(actionParameter ?? String.Empty) ? $"({ActionAdjustmentValues[actionParameter]})" : $"(0)";
 
 
         protected override String GetAdjustmentDisplayName(String actionParameter, PluginImageSize imageSize) =>

@@ -38,17 +38,13 @@ namespace Loupedeck.StreamerBotPlugin.Commands
         public ActionCommand() : base("Action", "Choose and execute your actions", "Action")
         {
             this._httpService = HttpService.Instance;
-            this._setActions().Wait();
+            this._actions = this._httpService.GetActions().Actions;
             this.MakeProfileAction("tree");
-        }
-
-        private async Task<Action[]> _setActions() =>
-            this._actions = (await this._httpService.GetActions()).Actions;
-
+        }     
 
         protected override PluginProfileActionData GetProfileActionData()
         {
-            this._setActions().Wait();
+            this._actions = this._httpService.GetActions().Actions;
             var tree = new PluginProfileActionTree("Select Windows Settings Application");
 
             tree.AddLevel("Category");
@@ -71,10 +67,12 @@ namespace Loupedeck.StreamerBotPlugin.Commands
         {
             var action = this._actions?.FirstOrDefault(a => actionParameter is not null && a.Id == actionParameter);
 
-            if (action != null)
+            if (action == null)
             {
-                this._httpService.ExecuteAction(action.Id).Wait();
+                return;
             }
+            
+            this._httpService.ExecuteAction(action.Id);
         }
 
         protected override String GetCommandDisplayName(String actionParameter, PluginImageSize imageSize) =>

@@ -6,16 +6,13 @@ namespace Loupedeck.StreamerBotPlugin
 
     public class StreamerBotPlugin : Plugin
     {
-        internal static StreamerBotPlugin Instance { get; private set; }
         public override Boolean HasNoApplication => true;
         public override Boolean UsesApplicationApiOnly => true;
 
         private const String RESOURCE_PATH = "Loupedeck.StreamerBotPlugin.Resources";
 
-        public StreamerBotPlugin() => Instance = this;
-
         public override void Load()
-        {            
+        {
             this.Info.Icon16x16 = EmbeddedResources.ReadImage($"{RESOURCE_PATH}.Icons.sblogo16.png");
             this.Info.Icon32x32 = EmbeddedResources.ReadImage($"{RESOURCE_PATH}.Icons.sblogo32.png");
             this.Info.Icon48x48 = EmbeddedResources.ReadImage($"{RESOURCE_PATH}.Icons.sblogo48.png");
