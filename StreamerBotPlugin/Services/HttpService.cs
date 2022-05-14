@@ -33,9 +33,6 @@ namespace Loupedeck.StreamerBotPlugin.Services
 
     public class HttpService : IDisposable
     {
-        public EventHandler OnSuccess { get; set; } = delegate { };
-        public EventHandler OnFailure { get; set; } = delegate { };
-
         public static HttpService Instance { get; } = new();
         private readonly HttpClient _httpClient;
         private readonly CancellationTokenSource _cancellationTokenSource;
@@ -48,13 +45,13 @@ namespace Loupedeck.StreamerBotPlugin.Services
             this._httpClient.Timeout = TimeSpan.FromSeconds(5);
         }
 
-        public async Task<GetActions> GetActions()
+        public GetActions GetActions()
         {
             try
             {
-                var response = await this._httpClient.GetAsync("/GetActions", this._cancellationTokenSource.Token);
+                var response = this._httpClient.GetAsync("/GetActions", this._cancellationTokenSource.Token).Result;
                 this.OnSuccess.Invoke(this, EventArgs.Empty);
-                return JsonConvert.DeserializeObject<GetActions>(await response.Content.ReadAsStringAsync());
+                return JsonConvert.DeserializeObject<GetActions>(response.Content.ReadAsStringAsync().Result);
             }
             catch (Exception)
             {
@@ -63,13 +60,13 @@ namespace Loupedeck.StreamerBotPlugin.Services
             }
         }
 
-        public async Task ExecuteAction(String actionId)
+        public void ExecuteAction(String actionId)
         {
             var json = JsonConvert.SerializeObject(new { action = new { id = actionId } });
 
             try
             {
-                await this._httpClient.PostAsync("/DoAction", new StringContent(json), this._cancellationTokenSource.Token);
+                this._httpClient.PostAsync("/DoAction", new StringContent(json), this._cancellationTokenSource.Token).Wait();
                 this.OnSuccess.Invoke(this, EventArgs.Empty);
             }
             catch (Exception)
@@ -78,13 +75,13 @@ namespace Loupedeck.StreamerBotPlugin.Services
             }
         }
 
-        public async Task ExecuteActionValue(String actionId, Object value)
+        public void ExecuteActionValue(String actionId, Object value)
         {
             var json = JsonConvert.SerializeObject(new { action = new { id = actionId }, args = new { value } });
 
             try
             {              
-                await this._httpClient.PostAsync("/DoAction", new StringContent(json), this._cancellationTokenSource.Token);
+                this._httpClient.PostAsync("/DoAction", new StringContent(json), this._cancellationTokenSource.Token).Wait();
                 this.OnSuccess.Invoke(this, EventArgs.Empty);
             }
             catch (Exception)
@@ -92,6 +89,9 @@ namespace Loupedeck.StreamerBotPlugin.Services
                 this.OnFailure.Invoke(this, EventArgs.Empty);
             }
         }
+
+        public EventHandler OnSuccess { get; set; } = delegate { };
+        public EventHandler OnFailure { get; set; } = delegate { };
 
         public void Dispose()
         {

@@ -35,17 +35,17 @@
     <DebugType>None</DebugType>
     <OutputPath>$(BaseOutputPath)win\</OutputPath>
     <PostBuildEvent>
-            cd $(OutputPath)
-            dir /s /b
-            del *.xml
-            del *.config
-            $(LibZPath) inject-dll --assembly $(AssemblyName).dll --include *.dll --exclude $(AssemblyName).dll --move
-            cd $(SolutionDir)
-            PowerShell -command Remove-Item .\Installer -Recurse -ErrorAction Ignore
-            PowerShell -command New-Item -Path .\Installer -ItemType Directory
-            PowerShell -command Compress-Archive -Path $(SolutionDir)LoupedeckPackage.yaml,$(SolutionDir)bin -DestinationPath $(SolutionDir)Installer\$(AssemblyName).zip -CompressionLevel Fastest -Force
-            PowerShell -command Rename-Item -Path .\Installer\$(AssemblyName).zip -newName $(AssemblyName).lplug4
-        </PostBuildEvent>
+		cd $(OutputPath)
+		dir /s /b
+		del *.xml
+		del *.config
+		$(LibZPath) inject-dll --assembly $(AssemblyName).dll --include *.dll --exclude $(AssemblyName).dll --move
+		cd $(SolutionDir)
+		PowerShell -command Remove-Item .\Installer -Recurse -ErrorAction Ignore
+		PowerShell -command New-Item -Path .\Installer -ItemType Directory
+		PowerShell -command Compress-Archive -Path $(SolutionDir)LoupedeckPackage.yaml,$(SolutionDir)bin -DestinationPath $(SolutionDir)Installer\$(AssemblyName).zip -CompressionLevel Fastest -Force
+		PowerShell -command Rename-Item -Path .\Installer\$(AssemblyName).zip -newName $(AssemblyName).lplug4
+	</PostBuildEvent>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
