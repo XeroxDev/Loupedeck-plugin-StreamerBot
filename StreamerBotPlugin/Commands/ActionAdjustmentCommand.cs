@@ -37,13 +37,13 @@ namespace Loupedeck.StreamerBotPlugin.Commands
         public ActionAdjustmentCommand() : base("Adjustment Action", "Choose and execute your actions with adjustments (Reset sets it to 0)", "Adjustment Action", true)
         {
             this._httpService = HttpService.Instance;
-            this._actions = this._httpService.GetActions()?.Actions ?? Array.Empty<Action>();
+            this._actions = this._httpService.GetActions().Actions;
             this.MakeProfileAction("tree");
         }
 
         protected override PluginProfileActionData GetProfileActionData()
         {
-            this._actions = this._httpService.GetActions()?.Actions ?? Array.Empty<Action>();
+            this._actions = this._httpService.GetActions().Actions;
             var tree = new PluginProfileActionTree("Select Windows Settings Application");
 
             tree.AddLevel("Category");
@@ -61,7 +61,7 @@ namespace Loupedeck.StreamerBotPlugin.Commands
 
         protected override void RunCommand(String actionParameter)
         {
-            var action = this._actions?.FirstOrDefault(a => actionParameter is not null && a.Id == actionParameter);
+            var action = this._actions.FirstOrDefault(a => actionParameter is not null && a.Id == actionParameter);
 
             if (action == null)
             {
@@ -73,7 +73,7 @@ namespace Loupedeck.StreamerBotPlugin.Commands
 
         protected override void ApplyAdjustment(String actionParameter, Int32 diff)
         {
-            var action = this._actions?.FirstOrDefault(a => actionParameter is not null && a.Id == actionParameter);
+            var action = this._actions.FirstOrDefault(a => actionParameter is not null && a.Id == actionParameter);
 
             if (action == null)
             {
@@ -84,9 +84,9 @@ namespace Loupedeck.StreamerBotPlugin.Commands
         }
 
         protected override String GetAdjustmentDisplayName(String actionParameter, PluginImageSize imageSize) =>
-            this._actions?.FirstOrDefault(a => actionParameter is not null && a.Id == actionParameter)?.Name ?? base.GetCommandDisplayName(actionParameter, imageSize);
+            this._actions.FirstOrDefault(a => actionParameter is not null && a.Id == actionParameter)?.Name ?? base.GetCommandDisplayName(actionParameter, imageSize);
 
         protected override String GetCommandDisplayName(String actionParameter, PluginImageSize imageSize) =>
-            this._actions?.FirstOrDefault(a => actionParameter is not null && a.Id == actionParameter)?.Name ?? base.GetCommandDisplayName(actionParameter, imageSize);
+            this._actions.FirstOrDefault(a => actionParameter is not null && a.Id == actionParameter)?.Name ?? base.GetCommandDisplayName(actionParameter, imageSize);
     }
 }

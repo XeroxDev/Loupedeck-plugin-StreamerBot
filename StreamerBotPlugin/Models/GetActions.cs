@@ -27,14 +27,21 @@ namespace Loupedeck.StreamerBotPlugin.Models.Receive
     public class GetActions
     {
         public Int32 Count { get; set; }
-        public Action[] Actions { get; set; }
+        public Action[] Actions { get; set; } = Array.Empty<Action>();
     }
 
     public class Action
     {
         public String Id { get; set; }
         public String Name { get; set; }
-        public String Group { get; set; }
+        
+        private String _group;
+        public String Group
+        {
+            get => this._group;
+            set => this._group = String.IsNullOrEmpty(value) ? "None" : value;
+        }
+        
         public Boolean Enabled { get; set; }
     }
 }
