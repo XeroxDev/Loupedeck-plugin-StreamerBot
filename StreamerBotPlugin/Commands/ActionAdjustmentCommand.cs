@@ -46,15 +46,18 @@ namespace Loupedeck.StreamerBotPlugin.Commands
             this._actions = this._httpService.GetActions().Actions;
             var tree = new PluginProfileActionTree("Select Windows Settings Application");
 
-            tree.AddLevel("Category");
+            tree.AddLevel("Group");
             tree.AddLevel("Command");
 
-            var node = tree.Root.AddNode("Actions");
-
-            foreach (var item in this._actions.Where(action => action.Enabled))
+            this._actions.GroupBy(x => x.Group).ToList().ForEach(actionGroup =>
             {
-                node.AddItem(item.Id, item.Name, $"Execute {item.Name}");
-            }
+                var node = tree.Root.AddNode(actionGroup.Key);
+
+                foreach (var item in actionGroup.Where(action => action.Enabled))
+                {                
+                    node.AddItem(item.Id, item.Name, $"Execute {item.Name}");
+                }
+            });
 
             return tree;
         }
